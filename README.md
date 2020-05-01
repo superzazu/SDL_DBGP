@@ -15,3 +15,5 @@ DBGP_Quit();
 ```
 
 Checkout the example program `example.c`, and build the docs by running `doxygen Doxyfile` in this directory.
+
+![screenshot](screenshot.png)
