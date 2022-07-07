@@ -25,6 +25,10 @@ int DBGP_OpenFont(
   }
 
   SDL_Texture* target = SDL_GetRenderTarget(renderer);
+  Uint8 r = 0, g = 0, b = 0, a = 0;
+  if (SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a) != 0) {
+    SDL_Log("Error while getting renderer draw color: %s", SDL_GetError());
+  }
 
   // draw all glyphs on texture once
   SDL_SetRenderTarget(renderer, font->tex);
@@ -50,6 +54,7 @@ int DBGP_OpenFont(
   }
 
   SDL_SetRenderTarget(renderer, target);
+  SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
   return 0;
 }
@@ -94,6 +99,11 @@ int DBGP_Print(
     const char* str) {
   if (font == NULL || font->tex == NULL || renderer == NULL) {
     return -1;
+  }
+
+  Uint8 r = 0, g = 0, b = 0, a = 0;
+  if (SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a) != 0) {
+    SDL_Log("Error while getting renderer draw color: %s", SDL_GetError());
   }
 
   for (int pass = 0; pass < 2; pass++) {
@@ -145,6 +155,8 @@ int DBGP_Print(
       ptr += 1;
     }
   }
+
+  SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
   return 0;
 }
