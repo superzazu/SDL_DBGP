@@ -46,6 +46,6 @@ if __name__ == "__main__":
         f.write(
             f"static const unsigned int DBGP_UNSCII{args.bytes}_NB_GLYPHS = 256;\n")
         f.write(
-            f"static const char DBGP_UNSCII{args.bytes}[256 * {args.bytes}] = {{")
+            f"static const unsigned char DBGP_UNSCII{args.bytes}[256 * {args.bytes}] = {{")
         f.write(", ".join(map(hex, output_data)))
         f.write("};\n")

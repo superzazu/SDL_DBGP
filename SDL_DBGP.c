@@ -4,8 +4,9 @@
 #define GLYPHS_PER_LINE (256 / 8)
 
 int DBGP_OpenFont(
-    DBGP_Font* font, SDL_Renderer* renderer, const char* const raw_data,
-    size_t raw_data_len, Uint8 glyph_width, Uint8 glyph_height) {
+    DBGP_Font* font, SDL_Renderer* renderer,
+    const unsigned char* const raw_data, size_t raw_data_len, Uint8 glyph_width,
+    Uint8 glyph_height) {
   if (font == NULL) {
     return -1;
   }
@@ -39,7 +40,8 @@ int DBGP_OpenFont(
     const int y = i / GLYPHS_PER_LINE;
     const int x = i % GLYPHS_PER_LINE;
 
-    const char* ptr = &raw_data[i * font->glyph_width * font->glyph_height / 8];
+    const unsigned char* ptr =
+        &raw_data[i * font->glyph_width * font->glyph_height / 8];
     for (int gy = 0; gy < font->glyph_height; gy++) {
       for (int gx = 0; gx < font->glyph_width; gx++) {
         SDL_bool pixel = (*ptr >> (7 - gx)) & 1;

@@ -66,8 +66,9 @@ struct DBGP_Font {
 typedef struct DBGP_Font DBGP_Font; /**< Convenience typedef */
 
 /**
- * \fn int DBGP_OpenFont(DBGP_Font* font, SDL_Renderer* renderer, const char*
- const raw_data, size_t raw_data_len, Uint8 glyph_width, Uint8 glyph_height)
+ * \fn int DBGP_OpenFont(DBGP_Font* font, SDL_Renderer* renderer, const unsigned
+ char* const raw_data, size_t raw_data_len, Uint8 glyph_width, Uint8
+ glyph_height)
  * \brief Loads a font to use with DBGP_Print and DBGP_Printf
  *
  * For convenience, DBGP provides two fonts: UNSCII-8 (8x8px) and UNSCII-16
@@ -91,8 +92,9 @@ typedef struct DBGP_Font DBGP_Font; /**< Convenience typedef */
  * \sa DBGP_CloseFont
  */
 int DBGP_OpenFont(
-    DBGP_Font* font, SDL_Renderer* renderer, const char* const raw_data,
-    size_t raw_data_len, Uint8 glyph_width, Uint8 glyph_height);
+    DBGP_Font* font, SDL_Renderer* renderer,
+    const unsigned char* const raw_data, size_t raw_data_len, Uint8 glyph_width,
+    Uint8 glyph_height);
 
 /**
  * \fn void DBGP_CloseFont(DBGP_Font* font)
