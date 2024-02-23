@@ -61,6 +61,8 @@ int main(void) {
   char* iso_string =
       SDL_iconv_string("ISO-8859-1", "UTF-8", "Ébène", sizeof("Ébène"));
 
+  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
   int should_quit = 0;
   SDL_Event event;
   while (!should_quit) {
@@ -125,6 +127,14 @@ int main(void) {
       int y = (8 * 16) + (i / 32) * DBGP_UNSCII8_HEIGHT;
       DBGP_ColorPrintf(&unscii8, renderer, x, y, DBGP_DEFAULT_COLORS, "%c", i);
     }
+
+    // SDL_SetRenderDrawColor(renderer, 0xFF, 0xff, 0xff, 0xff);
+    // SDL_RenderClear(renderer);
+
+    SDL_Color bg = {20, 20, 140, 120};
+    SDL_Color fg = {180, 120, 120, 255};
+    DBGP_Printf(
+        &unscii16, renderer, 0, 20 * 10, bg, fg, "Bonjour RGB colours!");
 
     SDL_RenderPresent(renderer);
   }

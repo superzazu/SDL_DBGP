@@ -71,6 +71,77 @@ void DBGP_CloseFont(DBGP_Font* font) {
   }
 }
 
+int DBGP_Print(
+    DBGP_Font* font, SDL_Renderer* renderer, int x, int y, SDL_Color bg_color,
+    SDL_Color fg_color, const char* str) {
+  if (font == NULL || font->tex == NULL || renderer == NULL) {
+    return -1;
+  }
+
+  Uint8 r = 0, g = 0, b = 0, a = 0;
+  if (SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a) != 0) {
+    SDL_Log("Error while getting renderer draw color: %s", SDL_GetError());
+  }
+
+  for (int pass = 0; pass < 2; pass++) {
+    int ix = x;
+    int iy = y;
+
+    if (pass == 0) {
+      SDL_SetRenderDrawColor(
+          renderer, bg_color.r, bg_color.g, bg_color.b, bg_color.a);
+    } else {
+      // SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+      SDL_SetTextureAlphaMod(font->tex, fg_color.a);
+      SDL_SetTextureColorMod(font->tex, fg_color.r, fg_color.g, fg_color.b);
+    }
+
+    const char* ptr = str;
+    while (*ptr != '\0') {
+      if (*ptr == '\n') {
+        iy += font->glyph_height;
+        ix = x;
+      } else {
+        SDL_Rect r = {ix, iy, font->glyph_width, font->glyph_height};
+
+        if (pass == 0) {
+          // background
+          SDL_RenderFillRect(renderer, &r);
+        } else {
+          // foreground
+          Uint8 i = *ptr;
+          SDL_Rect src = {
+              i % GLYPHS_PER_LINE * font->glyph_width,
+              i / GLYPHS_PER_LINE * font->glyph_height, font->glyph_width,
+              font->glyph_height};
+          SDL_RenderCopy(renderer, font->tex, &src, &r);
+        }
+
+        ix += font->glyph_width;
+      }
+
+      ptr += 1;
+    }
+  }
+
+  SDL_SetRenderDrawColor(renderer, r, g, b, a);
+
+  return 0;
+}
+
+static char printf_buffer[DBGP_MAX_STR_LEN];
+
+int DBGP_Printf(
+    DBGP_Font* font, SDL_Renderer* renderer, int x, int y, SDL_Color bg_color,
+    SDL_Color fg_color, const char* fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  SDL_vsnprintf(printf_buffer, DBGP_MAX_STR_LEN, fmt, args);
+  va_end(args);
+
+  return DBGP_Print(font, renderer, x, y, bg_color, fg_color, printf_buffer);
+}
+
 static inline SDL_bool is_hex(char c) {
   return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') ||
          (c >= 'A' && c <= 'F');
@@ -144,7 +215,7 @@ int DBGP_ColorPrint(
               i / GLYPHS_PER_LINE * font->glyph_height, font->glyph_width,
               font->glyph_height};
           Uint32 fg_color = color_palette[icolors & 0xf];
-          SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+          // SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
           SDL_SetTextureColorMod(
               font->tex, (fg_color >> 16) & 0xff, (fg_color >> 8) & 0xff,
               fg_color & 0xff);
@@ -162,8 +233,6 @@ int DBGP_ColorPrint(
 
   return 0;
 }
-
-static char printf_buffer[DBGP_MAX_STR_LEN];
 
 int DBGP_ColorPrintf(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, Uint8 colors,
