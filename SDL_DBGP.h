@@ -19,8 +19,8 @@
  *
  * \sa DBGP_OpenFont
  * \sa DBGP_CloseFont
- * \sa DBGP_Print
- * \sa DBGP_Printf
+ * \sa DBGP_ColorPrint
+ * \sa DBGP_ColorPrintf
  *
  */
 
@@ -105,8 +105,8 @@ int DBGP_OpenFont(
 void DBGP_CloseFont(DBGP_Font* font);
 
 /**
- * \fn int DBGP_Print(DBGP_Font* font, SDL_Renderer* renderer, int x, int y,
- Uint8 colors, const char* str)
+ * \fn int DBGP_ColorPrint(DBGP_Font* font, SDL_Renderer* renderer, int x, int
+ y, Uint8 colors, const char* str)
  * \brief Draws some text on a renderer
  *
  * The colors parameter is an unsigned byte, where the four least significant
@@ -116,7 +116,7 @@ void DBGP_CloseFont(DBGP_Font* font);
  *
  * For example, to display "Hello world" in white at (10, 50):
  * \code
- * DBGP_Print(font, renderer, 10, 50, 0xF, "Hello world")
+ * DBGP_ColorPrint(font, renderer, 10, 50, 0xF, "Hello world")
  * \endcode
  *
  * This function supports color escape codes to change colors in the middle of
@@ -135,20 +135,20 @@ void DBGP_CloseFont(DBGP_Font* font);
  *   \return zero on success, -1 on error. You can retrieve the error message
  *           with a call to SDL_GetError()
  *
- * \sa DBGP_Printf
+ * \sa DBGP_ColorPrintf
  */
-int DBGP_Print(
+int DBGP_ColorPrint(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, Uint8 colors,
     const char* str);
 
 /**
- * \fn int DBGP_Printf(DBGP_Font* font, SDL_Renderer* renderer, int x, int y,
- Uint8 colors, const char* fmt, ...)
+ * \fn int DBGP_ColorPrintf(DBGP_Font* font, SDL_Renderer* renderer, int x, int
+ y, Uint8 colors, const char* fmt, ...)
  * \brief Formats and draws some text on a renderer
  *
- * Same as DBGP_Print, but formats the string `fmt` with variable arguments
+ * Same as DBGP_ColorPrint, but formats the string `fmt` with variable arguments
  * first. The maximum output size is fixed and can be changed by defining
- * `DBGP_MAX_STR_LEN` before including DBGP.h. See DBGP_Print documentation
+ * `DBGP_MAX_STR_LEN` before including DBGP.h. See DBGP_ColorPrint documentation
  * for more information about the other parameters.
  *
  *    \param font The font to draw with
@@ -163,9 +163,9 @@ int DBGP_Print(
  *   \return zero on success, -1 on error. You can retrieve the error message
  *           with a call to SDL_GetError()
  *
- * \sa DBGP_Print
+ * \sa DBGP_ColorPrint
  */
-int DBGP_Printf(
+int DBGP_ColorPrintf(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, Uint8 colors,
     const char* fmt, ...);
 

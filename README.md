@@ -39,9 +39,9 @@ int main(void) {
     SDL_SetRenderDrawColor(renderer, 0x30, 0x30, 0x30, 0xff);
     SDL_RenderClear(renderer);
 
-    DBGP_Print(&font, renderer, 0, 0, DBGP_DEFAULT_COLORS, "Hello world!");
-    DBGP_Printf(&font, renderer, 32, 32, 0x3f, "Hello %s", "Bobby");
-    DBGP_Print(
+    DBGP_ColorPrint(&font, renderer, 0, 0, DBGP_DEFAULT_COLORS, "Hello world!");
+    DBGP_ColorPrintf(&font, renderer, 32, 32, 0x3f, "Hello %s", "Bobby");
+    DBGP_ColorPrint(
         &font, renderer, 0, 64, 0x0f,
         "Color can be changed with\n"
         "$09e$0As$0Bc$0Ca$0Dp$0Ee$0F"

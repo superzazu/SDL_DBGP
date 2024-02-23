@@ -96,7 +96,7 @@ static const Uint32 color_palette[16] = {
     0xff5555, 0xff55ff, 0xffff55, 0xffffff,
 };
 
-int DBGP_Print(
+int DBGP_ColorPrint(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, Uint8 colors,
     const char* str) {
   if (font == NULL || font->tex == NULL || renderer == NULL) {
@@ -165,7 +165,7 @@ int DBGP_Print(
 
 static char printf_buffer[DBGP_MAX_STR_LEN];
 
-int DBGP_Printf(
+int DBGP_ColorPrintf(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, Uint8 colors,
     const char* fmt, ...) {
   va_list args;
@@ -173,7 +173,7 @@ int DBGP_Printf(
   SDL_vsnprintf(printf_buffer, DBGP_MAX_STR_LEN, fmt, args);
   va_end(args);
 
-  return DBGP_Print(font, renderer, x, y, colors, printf_buffer);
+  return DBGP_ColorPrint(font, renderer, x, y, colors, printf_buffer);
 }
 
 #undef GLYPHS_PER_LINE
