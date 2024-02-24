@@ -124,6 +124,7 @@ int DBGP_Print(
     }
   }
 
+  SDL_SetTextureAlphaMod(font->tex, 255);
   SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
   return 0;
