@@ -1,4 +1,5 @@
-#include <SDL.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 #include "SDL_DBGP.h"
 #include "SDL_DBGP_unscii16.h"
 #include "SDL_DBGP_unscii8.h"
@@ -7,43 +8,37 @@
 #define WIN_HEIGHT 342
 
 void screenshot(SDL_Renderer* renderer, const char* filename) {
-  int width = 0;
-  int height = 0;
-  SDL_GetRendererOutputSize(renderer, &width, &height);
-
-  SDL_Surface* screenshot = SDL_CreateRGBSurface(
-      0, width, height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
-  SDL_RenderReadPixels(
-      renderer, NULL, SDL_PIXELFORMAT_ARGB8888, screenshot->pixels,
-      screenshot->pitch);
+  SDL_Surface* screenshot = SDL_RenderReadPixels(renderer, NULL);
   SDL_SaveBMP(screenshot, filename);
-  SDL_FreeSurface(screenshot);
+  SDL_DestroySurface(screenshot);
 }
 
 int main(void) {
-  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-    SDL_Log("Unable to initialise SDL2: %s", SDL_GetError());
+  if (!SDL_Init(SDL_INIT_VIDEO)) {
+    SDL_Log("Unable to initialise SDL3: %s", SDL_GetError());
     return 1;
   }
   SDL_SetHint(SDL_HINT_BMP_SAVE_LEGACY_FORMAT, "1");
 
   SDL_Window* window = SDL_CreateWindow(
-      "SDL_DBGP-test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-      WIN_WIDTH, WIN_HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+      "SDL_DBGP-test", WIN_WIDTH, WIN_HEIGHT,
+      SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
   if (window == NULL) {
     SDL_Log("Unable to create window: %s", SDL_GetError());
     return 1;
   }
-  SDL_Renderer* renderer = SDL_CreateRenderer(
-      window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  SDL_Renderer* renderer = SDL_CreateRenderer(window, NULL);
   if (renderer == NULL) {
     SDL_Log("unable to create renderer: %s", SDL_GetError());
     return 1;
   }
-  SDL_RenderSetLogicalSize(renderer, WIN_WIDTH, WIN_HEIGHT);
+  SDL_SetRenderVSync(renderer, true);
+  SDL_SetRenderLogicalPresentation(
+      renderer, WIN_WIDTH, WIN_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX,
+      SDL_SCALEMODE_NEAREST);
 
   DBGP_Font unscii16;
-  if (DBGP_OpenFont(
+  if (!DBGP_OpenFont(
           &unscii16, renderer, DBGP_UNSCII16, sizeof(DBGP_UNSCII16),
           DBGP_UNSCII16_WIDTH, DBGP_UNSCII16_HEIGHT) != 0) {
     SDL_Log("Unable to initialise DBGP_UNSCII16: %s", SDL_GetError());
@@ -51,7 +46,7 @@ int main(void) {
   }
 
   DBGP_Font unscii8;
-  if (DBGP_OpenFont(
+  if (!DBGP_OpenFont(
           &unscii8, renderer, DBGP_UNSCII8, sizeof(DBGP_UNSCII8),
           DBGP_UNSCII8_WIDTH, DBGP_UNSCII8_HEIGHT) != 0) {
     SDL_Log("Unable to initialise DBGP_UNSCII8: %s", SDL_GetError());
@@ -68,24 +63,24 @@ int main(void) {
   while (!should_quit) {
     while (SDL_PollEvent(&event)) {
       switch (event.type) {
-      case SDL_QUIT: should_quit = 1; break;
+      case SDL_EVENT_QUIT: should_quit = 1; break;
 
-      case SDL_KEYDOWN:
-        if (event.key.keysym.sym == SDLK_s) {
+      case SDL_EVENT_KEY_DOWN:
+        if (event.key.key == SDLK_S) {
           screenshot(renderer, "screenshot.bmp");
         }
         break;
-      case SDL_RENDER_TARGETS_RESET: {
+      case SDL_EVENT_RENDER_TARGETS_RESET: {
         // in case of target reset, we must reload each font
         DBGP_CloseFont(&unscii8);
-        if (DBGP_OpenFont(
+        if (!DBGP_OpenFont(
                 &unscii8, renderer, DBGP_UNSCII8, sizeof(DBGP_UNSCII8),
                 DBGP_UNSCII8_WIDTH, DBGP_UNSCII8_HEIGHT) != 0) {
           SDL_Log("Unable to initialise DBGP: %s", SDL_GetError());
         }
 
         DBGP_CloseFont(&unscii16);
-        if (DBGP_OpenFont(
+        if (!DBGP_OpenFont(
                 &unscii16, renderer, DBGP_UNSCII16, sizeof(DBGP_UNSCII16),
                 DBGP_UNSCII16_WIDTH, DBGP_UNSCII16_HEIGHT) != 0) {
           SDL_Log("Unable to initialise DBGP: %s", SDL_GetError());

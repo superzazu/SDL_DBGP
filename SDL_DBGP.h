@@ -3,7 +3,7 @@
 /**
  * \mainpage SDL_DBGP
  *
- * SDL_DBGP (DeBuG Print) is a C99 library to display ASCII text in SDL2
+ * SDL_DBGP (DeBuG Print) is a C99 library to display ASCII text in SDL3
  * programs (in a VGA-like text mode), greatly inspired by
  * [bgfx](https://github.com/bkaradzic/bgfx) debug text API. To install, copy
  * DBGP.c/.h and a font file (SDL_DBGP_unscii8.h or SDL_DBGP_unscii16.h) in your
@@ -29,11 +29,11 @@
 #ifndef DBGP_DBGP_H
 #define DBGP_DBGP_H
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 /** The size of the internal text formatting buffer used by DBGP_Printf */
 #ifndef DBGP_MAX_STR_LEN
-#define DBGP_MAX_STR_LEN SDL_MAX_LOG_MESSAGE
+#define DBGP_MAX_STR_LEN 4096
 #endif
 
 /** For "DBGP_Color*" functions only. The escape character used for changing
@@ -70,7 +70,7 @@ struct DBGP_Font {
 typedef struct DBGP_Font DBGP_Font; /**< Convenience typedef */
 
 /**
- * \fn int DBGP_OpenFont(DBGP_Font* font, SDL_Renderer* renderer,
+ * \fn SDL_bool DBGP_OpenFont(DBGP_Font* font, SDL_Renderer* renderer,
  * const unsigned char* const raw_data, size_t raw_data_len, Uint8 glyph_width,
  * Uint8 glyph_height)
  * \brief Loads a font to use with DBGP_Print and DBGP_Printf
@@ -90,12 +90,12 @@ typedef struct DBGP_Font DBGP_Font; /**< Convenience typedef */
  *    \param raw_data_len The size in bytes of raw_data
  *    \param glyph_width the width in pixels of one glyph (character)
  *    \param glyph_height the height in pixels of one glyph (character)
- *   \return zero on success, -1 on error. You can retrieve the error
- *           message with a call to SDL_GetError()
+ *   \return SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *           for more information.
  *
  * \sa DBGP_CloseFont
  */
-int DBGP_OpenFont(
+SDL_bool DBGP_OpenFont(
     DBGP_Font* font, SDL_Renderer* renderer,
     const unsigned char* const raw_data, size_t raw_data_len, Uint8 glyph_width,
     Uint8 glyph_height);
@@ -109,7 +109,7 @@ int DBGP_OpenFont(
 void DBGP_CloseFont(DBGP_Font* font);
 
 /**
- * \fn int DBGP_ColorPrint(DBGP_Font* font, SDL_Renderer* renderer, int x,
+ * \fn SDL_bool DBGP_ColorPrint(DBGP_Font* font, SDL_Renderer* renderer, int x,
  * int y, Uint8 colors, const char* str)
  * \brief Draws some text on a renderer
  *
@@ -136,17 +136,17 @@ void DBGP_CloseFont(DBGP_Font* font);
  * bits correspond to the background color, 4 least significant bits correspond
  * to the foreground color)
  *    \param str The text to draw
- *   \return zero on success, -1 on error. You can retrieve the error message
- *           with a call to SDL_GetError()
+ *   \return SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *           for more information.
  *
  * \sa DBGP_ColorPrintf
  */
-int DBGP_ColorPrint(
+SDL_bool DBGP_ColorPrint(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, Uint8 colors,
     const char* str);
 
 /**
- * \fn int DBGP_ColorPrintf(DBGP_Font* font, SDL_Renderer* renderer, int x,
+ * \fn SDL_bool DBGP_ColorPrintf(DBGP_Font* font, SDL_Renderer* renderer, int x,
  * int y, Uint8 colors, const char* fmt, ...)
  * \brief Formats and draws some text on a renderer
  *
@@ -164,18 +164,18 @@ int DBGP_ColorPrint(
  color)
  *    \param fmt The string to format
  *    \param ... Variable arguments to format the string with
- *   \return zero on success, -1 on error. You can retrieve the error message
- *           with a call to SDL_GetError()
+ *   \return SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *           for more information.
  *
  * \sa DBGP_ColorPrint
  */
-int DBGP_ColorPrintf(
+SDL_bool DBGP_ColorPrintf(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, Uint8 colors,
     const char* fmt, ...);
 
 /**
- * \fn int DBGP_Print(DBGP_Font* font, SDL_Renderer* renderer, int x, int y,
- * SDL_Color bg_color, SDL_Color fg_color, const char* str)
+ * \fn SDL_bool DBGP_Print(DBGP_Font* font, SDL_Renderer* renderer, int x,
+ * int y, SDL_Color bg_color, SDL_Color fg_color, const char* str)
  * \brief Draws some text on a renderer
  *
  *    \param font The DBGP_Font object
@@ -185,18 +185,18 @@ int DBGP_ColorPrintf(
  *    \param bg_color Background color
  *    \param fg_color Foreground (text) color
  *    \param str The text to draw
- *   \return zero on success, -1 on error. You can retrieve the error message
- *           with a call to SDL_GetError()
+ *   \return SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *           for more information.
  *
  * \sa DBGP_Printf
  */
-int DBGP_Print(
+SDL_bool DBGP_Print(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, SDL_Color bg_color,
     SDL_Color fg_color, const char* str);
 
 /**
- * \fn int DBGP_Printf(DBGP_Font* font, SDL_Renderer* renderer, int x, int y,
- * SDL_Color bg_color, SDL_Color fg_color, const char* fmt, ...)
+ * \fn SDL_bool DBGP_Printf(DBGP_Font* font, SDL_Renderer* renderer, int x,
+ * int y, SDL_Color bg_color, SDL_Color fg_color, const char* fmt, ...)
  * \brief Formats and draws some text on a renderer
  *
  * Same as DBGP_Print, but formats the string `fmt` with variable arguments
@@ -212,12 +212,12 @@ int DBGP_Print(
  *    \param fg_color Foreground (text) color
  *    \param fmt The string to format
  *    \param ... Variable arguments to format the string with
- *   \return zero on success, -1 on error. You can retrieve the error message
- *           with a call to SDL_GetError()
+ *   \return SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *           for more information.
  *
  * \sa DBGP_Print
  */
-int DBGP_Printf(
+SDL_bool DBGP_Printf(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, SDL_Color bg_color,
     SDL_Color fg_color, const char* fmt, ...);
 
