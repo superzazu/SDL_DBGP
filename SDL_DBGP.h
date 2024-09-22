@@ -70,7 +70,7 @@ struct DBGP_Font {
 typedef struct DBGP_Font DBGP_Font; /**< Convenience typedef */
 
 /**
- * \fn SDL_bool DBGP_OpenFont(DBGP_Font* font, SDL_Renderer* renderer,
+ * \fn bool DBGP_OpenFont(DBGP_Font* font, SDL_Renderer* renderer,
  * const unsigned char* const raw_data, size_t raw_data_len, Uint8 glyph_width,
  * Uint8 glyph_height)
  * \brief Loads a font to use with DBGP_Print and DBGP_Printf
@@ -90,12 +90,12 @@ typedef struct DBGP_Font DBGP_Font; /**< Convenience typedef */
  *    \param raw_data_len The size in bytes of raw_data
  *    \param glyph_width the width in pixels of one glyph (character)
  *    \param glyph_height the height in pixels of one glyph (character)
- *   \return SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *   \return true on success or false on failure; call SDL_GetError()
  *           for more information.
  *
  * \sa DBGP_CloseFont
  */
-SDL_bool DBGP_OpenFont(
+bool DBGP_OpenFont(
     DBGP_Font* font, SDL_Renderer* renderer,
     const unsigned char* const raw_data, size_t raw_data_len, Uint8 glyph_width,
     Uint8 glyph_height);
@@ -109,7 +109,7 @@ SDL_bool DBGP_OpenFont(
 void DBGP_CloseFont(DBGP_Font* font);
 
 /**
- * \fn SDL_bool DBGP_ColorPrint(DBGP_Font* font, SDL_Renderer* renderer, int x,
+ * \fn bool DBGP_ColorPrint(DBGP_Font* font, SDL_Renderer* renderer, int x,
  * int y, Uint8 colors, const char* str)
  * \brief Draws some text on a renderer
  *
@@ -136,17 +136,17 @@ void DBGP_CloseFont(DBGP_Font* font);
  * bits correspond to the background color, 4 least significant bits correspond
  * to the foreground color)
  *    \param str The text to draw
- *   \return SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *   \return true on success or false on failure; call SDL_GetError()
  *           for more information.
  *
  * \sa DBGP_ColorPrintf
  */
-SDL_bool DBGP_ColorPrint(
+bool DBGP_ColorPrint(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, Uint8 colors,
     const char* str);
 
 /**
- * \fn SDL_bool DBGP_ColorPrintf(DBGP_Font* font, SDL_Renderer* renderer, int x,
+ * \fn bool DBGP_ColorPrintf(DBGP_Font* font, SDL_Renderer* renderer, int x,
  * int y, Uint8 colors, const char* fmt, ...)
  * \brief Formats and draws some text on a renderer
  *
@@ -164,17 +164,17 @@ SDL_bool DBGP_ColorPrint(
  color)
  *    \param fmt The string to format
  *    \param ... Variable arguments to format the string with
- *   \return SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *   \return true on success or false on failure; call SDL_GetError()
  *           for more information.
  *
  * \sa DBGP_ColorPrint
  */
-SDL_bool DBGP_ColorPrintf(
+bool DBGP_ColorPrintf(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, Uint8 colors,
     const char* fmt, ...);
 
 /**
- * \fn SDL_bool DBGP_Print(DBGP_Font* font, SDL_Renderer* renderer, int x,
+ * \fn bool DBGP_Print(DBGP_Font* font, SDL_Renderer* renderer, int x,
  * int y, SDL_Color bg_color, SDL_Color fg_color, const char* str)
  * \brief Draws some text on a renderer
  *
@@ -185,17 +185,17 @@ SDL_bool DBGP_ColorPrintf(
  *    \param bg_color Background color
  *    \param fg_color Foreground (text) color
  *    \param str The text to draw
- *   \return SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *   \return true on success or false on failure; call SDL_GetError()
  *           for more information.
  *
  * \sa DBGP_Printf
  */
-SDL_bool DBGP_Print(
+bool DBGP_Print(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, SDL_Color bg_color,
     SDL_Color fg_color, const char* str);
 
 /**
- * \fn SDL_bool DBGP_Printf(DBGP_Font* font, SDL_Renderer* renderer, int x,
+ * \fn bool DBGP_Printf(DBGP_Font* font, SDL_Renderer* renderer, int x,
  * int y, SDL_Color bg_color, SDL_Color fg_color, const char* fmt, ...)
  * \brief Formats and draws some text on a renderer
  *
@@ -212,12 +212,12 @@ SDL_bool DBGP_Print(
  *    \param fg_color Foreground (text) color
  *    \param fmt The string to format
  *    \param ... Variable arguments to format the string with
- *   \return SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *   \return true on success or false on failure; call SDL_GetError()
  *           for more information.
  *
  * \sa DBGP_Print
  */
-SDL_bool DBGP_Printf(
+bool DBGP_Printf(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, SDL_Color bg_color,
     SDL_Color fg_color, const char* fmt, ...);
 

@@ -3,12 +3,12 @@
 
 #define GLYPHS_PER_LINE (256 / 8)
 
-SDL_bool DBGP_OpenFont(
+bool DBGP_OpenFont(
     DBGP_Font* font, SDL_Renderer* renderer,
     const unsigned char* const raw_data, size_t raw_data_len, Uint8 glyph_width,
     Uint8 glyph_height) {
   if (font == NULL) {
-    return SDL_FALSE;
+    return false;
   }
 
   font->glyph_width = glyph_width;
@@ -19,7 +19,7 @@ SDL_bool DBGP_OpenFont(
       GLYPHS_PER_LINE * glyph_width,
       font->nb_glyphs / GLYPHS_PER_LINE * glyph_height);
   if (font->tex == NULL) {
-    return SDL_FALSE;
+    return false;
   }
   if (!SDL_SetTextureBlendMode(font->tex, SDL_BLENDMODE_BLEND)) {
     SDL_Log("Error while setting blend mode: %s", SDL_GetError());
@@ -44,7 +44,7 @@ SDL_bool DBGP_OpenFont(
         &raw_data[i * font->glyph_width * font->glyph_height / 8];
     for (int gy = 0; gy < font->glyph_height; gy++) {
       for (int gx = 0; gx < font->glyph_width; gx++) {
-        SDL_bool pixel = (*ptr >> (7 - gx)) & 1;
+        bool pixel = (*ptr >> (7 - gx)) & 1;
         if (pixel) {
           SDL_RenderPoint(
               renderer, x * font->glyph_width + gx,
@@ -58,7 +58,7 @@ SDL_bool DBGP_OpenFont(
   SDL_SetRenderTarget(renderer, target);
   SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
-  return SDL_TRUE;
+  return true;
 }
 
 void DBGP_CloseFont(DBGP_Font* font) {
@@ -71,11 +71,11 @@ void DBGP_CloseFont(DBGP_Font* font) {
   }
 }
 
-SDL_bool DBGP_Print(
+bool DBGP_Print(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, SDL_Color bg_color,
     SDL_Color fg_color, const char* str) {
   if (font == NULL || font->tex == NULL || renderer == NULL) {
-    return SDL_FALSE;
+    return false;
   }
 
   Uint8 r = 0, g = 0, b = 0, a = 0;
@@ -127,12 +127,12 @@ SDL_bool DBGP_Print(
   SDL_SetTextureAlphaMod(font->tex, 255);
   SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
-  return SDL_TRUE;
+  return true;
 }
 
 static char printf_buffer[DBGP_MAX_STR_LEN];
 
-SDL_bool DBGP_Printf(
+bool DBGP_Printf(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, SDL_Color bg_color,
     SDL_Color fg_color, const char* fmt, ...) {
   va_list args;
@@ -143,7 +143,7 @@ SDL_bool DBGP_Printf(
   return DBGP_Print(font, renderer, x, y, bg_color, fg_color, printf_buffer);
 }
 
-static inline SDL_bool is_hex(char c) {
+static inline bool is_hex(char c) {
   return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') ||
          (c >= 'A' && c <= 'F');
 }
@@ -168,11 +168,11 @@ static const Uint32 color_palette[16] = {
     0xff5555, 0xff55ff, 0xffff55, 0xffffff,
 };
 
-SDL_bool DBGP_ColorPrint(
+bool DBGP_ColorPrint(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, Uint8 colors,
     const char* str) {
   if (font == NULL || font->tex == NULL || renderer == NULL) {
-    return SDL_FALSE;
+    return false;
   }
 
   Uint8 r = 0, g = 0, b = 0, a = 0;
@@ -232,10 +232,10 @@ SDL_bool DBGP_ColorPrint(
 
   SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
-  return SDL_TRUE;
+  return true;
 }
 
-SDL_bool DBGP_ColorPrintf(
+bool DBGP_ColorPrintf(
     DBGP_Font* font, SDL_Renderer* renderer, int x, int y, Uint8 colors,
     const char* fmt, ...) {
   va_list args;
