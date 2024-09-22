@@ -29,6 +29,7 @@
 #ifndef DBGP_DBGP_H
 #define DBGP_DBGP_H
 
+#include <stdbool.h>
 #include <SDL3/SDL.h>
 
 /** The size of the internal text formatting buffer used by DBGP_Printf */
