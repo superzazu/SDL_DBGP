@@ -34,8 +34,7 @@ int main(void) {
   }
   SDL_SetRenderVSync(renderer, true);
   SDL_SetRenderLogicalPresentation(
-      renderer, WIN_WIDTH, WIN_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX,
-      SDL_SCALEMODE_NEAREST);
+      renderer, WIN_WIDTH, WIN_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
   DBGP_Font unscii16;
   if (!DBGP_OpenFont(

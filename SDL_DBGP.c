@@ -21,6 +21,9 @@ bool DBGP_OpenFont(
   if (font->tex == NULL) {
     return false;
   }
+  if (!SDL_SetTextureScaleMode(font->tex, SDL_SCALEMODE_NEAREST)) {
+    SDL_Log("Error while setting scale mode: %s", SDL_GetError());
+  }
   if (!SDL_SetTextureBlendMode(font->tex, SDL_BLENDMODE_BLEND)) {
     SDL_Log("Error while setting blend mode: %s", SDL_GetError());
   }
