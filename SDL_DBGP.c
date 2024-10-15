@@ -2,22 +2,63 @@
 #include "SDL_DBGP.h"
 
 #define GLYPHS_PER_LINE (256 / 8)
+#define GLYPH_WIDTH 8
 
-bool DBGP_OpenFont(
+bool DBGP_CreateFont(
     DBGP_Font* font, SDL_Renderer* renderer,
-    const unsigned char* const raw_data, size_t raw_data_len, Uint8 glyph_width,
+    const unsigned char* const raw_data, size_t raw_data_len,
     Uint8 glyph_height) {
   if (font == NULL) {
     return false;
   }
 
-  font->glyph_width = glyph_width;
+  font->glyph_width = GLYPH_WIDTH;
   font->glyph_height = glyph_height;
   font->nb_glyphs = raw_data_len / font->glyph_height;
-  font->tex = SDL_CreateTexture(
-      renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-      GLYPHS_PER_LINE * glyph_width,
-      font->nb_glyphs / GLYPHS_PER_LINE * glyph_height);
+
+  SDL_Surface* surface = SDL_CreateSurface(
+      GLYPHS_PER_LINE * GLYPH_WIDTH,
+      font->nb_glyphs / GLYPHS_PER_LINE * font->glyph_height,
+      SDL_PIXELFORMAT_INDEX1LSB);
+  if (!surface) {
+    return false;
+  }
+  SDL_Palette* palette = SDL_CreatePalette(2);
+  if (!palette) {
+    return false;
+  }
+  SDL_Color colors[2] = {{0, 0, 0, 0}, {255, 255, 255, 255}};
+  if (!SDL_SetPaletteColors(palette, colors, 0, 2)) {
+    return false;
+  }
+  if (!SDL_SetSurfacePalette(surface, palette)) {
+    return false;
+  }
+
+  const int bytes_per_glyph = 1 * font->glyph_height;
+  for (size_t i = 0; i < raw_data_len; i++) {
+    const unsigned char* ptr = &raw_data[i];
+    int glyph_no = i / bytes_per_glyph;
+    int glyph_y = (glyph_no / GLYPHS_PER_LINE) * font->glyph_height;
+    int glyph_x = (glyph_no % GLYPHS_PER_LINE) * font->glyph_width;
+    int byte_no_in_glyph = i % bytes_per_glyph;
+
+    for (int bit = 0; bit < GLYPH_WIDTH; bit++) {
+      bool value = (*ptr >> ((GLYPH_WIDTH - 1) - bit)) & 1;
+
+      int x = glyph_x + bit;
+      int y = glyph_y + byte_no_in_glyph;
+
+      int position = y * GLYPHS_PER_LINE * GLYPH_WIDTH + x;
+      int byte_position = position / 8;
+      int byte_bit_no = position % 8;
+
+      Uint8* const target = (Uint8*) surface->pixels + byte_position;
+      *target |= value << byte_bit_no;
+    }
+  }
+
+  font->tex = SDL_CreateTextureFromSurface(renderer, surface);
   if (font->tex == NULL) {
     return false;
   }
@@ -28,43 +69,13 @@ bool DBGP_OpenFont(
     SDL_Log("Error while setting blend mode: %s", SDL_GetError());
   }
 
-  SDL_Texture* target = SDL_GetRenderTarget(renderer);
-  Uint8 r = 0, g = 0, b = 0, a = 0;
-  if (!SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a)) {
-    SDL_Log("Error while getting renderer draw color: %s", SDL_GetError());
-  }
-
-  // draw all glyphs on texture once
-  SDL_SetRenderTarget(renderer, font->tex);
-  SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
-  SDL_RenderClear(renderer);
-  SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-  for (unsigned int i = 0; i < font->nb_glyphs; i++) {
-    const int y = i / GLYPHS_PER_LINE;
-    const int x = i % GLYPHS_PER_LINE;
-
-    const unsigned char* ptr =
-        &raw_data[i * font->glyph_width * font->glyph_height / 8];
-    for (int gy = 0; gy < font->glyph_height; gy++) {
-      for (int gx = 0; gx < font->glyph_width; gx++) {
-        bool pixel = (*ptr >> (7 - gx)) & 1;
-        if (pixel) {
-          SDL_RenderPoint(
-              renderer, x * font->glyph_width + gx,
-              y * font->glyph_height + gy);
-        }
-      }
-      ptr += 1;
-    }
-  }
-
-  SDL_SetRenderTarget(renderer, target);
-  SDL_SetRenderDrawColor(renderer, r, g, b, a);
+  SDL_DestroySurface(surface);
+  SDL_DestroyPalette(palette);
 
   return true;
 }
 
-void DBGP_CloseFont(DBGP_Font* font) {
+void DBGP_DestroyFont(DBGP_Font* font) {
   if (font == NULL) {
     return;
   }
@@ -72,6 +83,9 @@ void DBGP_CloseFont(DBGP_Font* font) {
     SDL_DestroyTexture(font->tex);
     font->tex = NULL;
   }
+  font->glyph_width = 0;
+  font->glyph_height = 0;
+  font->nb_glyphs = 0;
 }
 
 bool DBGP_Print(
@@ -249,4 +263,5 @@ bool DBGP_ColorPrintf(
   return DBGP_ColorPrint(font, renderer, x, y, colors, printf_buffer);
 }
 
+#undef GLYPH_WIDTH
 #undef GLYPHS_PER_LINE

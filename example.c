@@ -37,17 +37,17 @@ int main(void) {
       renderer, WIN_WIDTH, WIN_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
   DBGP_Font unscii16;
-  if (!DBGP_OpenFont(
+  if (!DBGP_CreateFont(
           &unscii16, renderer, DBGP_UNSCII16, sizeof(DBGP_UNSCII16),
-          DBGP_UNSCII16_WIDTH, DBGP_UNSCII16_HEIGHT) != 0) {
+          DBGP_UNSCII16_HEIGHT)) {
     SDL_Log("Unable to initialise DBGP_UNSCII16: %s", SDL_GetError());
     return 1;
   }
 
   DBGP_Font unscii8;
-  if (!DBGP_OpenFont(
+  if (!DBGP_CreateFont(
           &unscii8, renderer, DBGP_UNSCII8, sizeof(DBGP_UNSCII8),
-          DBGP_UNSCII8_WIDTH, DBGP_UNSCII8_HEIGHT) != 0) {
+          DBGP_UNSCII8_HEIGHT)) {
     SDL_Log("Unable to initialise DBGP_UNSCII8: %s", SDL_GetError());
     return 1;
   }
@@ -71,17 +71,17 @@ int main(void) {
         break;
       case SDL_EVENT_RENDER_TARGETS_RESET: {
         // in case of target reset, we must reload each font
-        DBGP_CloseFont(&unscii8);
-        if (!DBGP_OpenFont(
+        DBGP_DestroyFont(&unscii8);
+        if (!DBGP_CreateFont(
                 &unscii8, renderer, DBGP_UNSCII8, sizeof(DBGP_UNSCII8),
-                DBGP_UNSCII8_WIDTH, DBGP_UNSCII8_HEIGHT) != 0) {
+                DBGP_UNSCII8_HEIGHT)) {
           SDL_Log("Unable to initialise DBGP: %s", SDL_GetError());
         }
 
-        DBGP_CloseFont(&unscii16);
-        if (!DBGP_OpenFont(
+        DBGP_DestroyFont(&unscii16);
+        if (!DBGP_CreateFont(
                 &unscii16, renderer, DBGP_UNSCII16, sizeof(DBGP_UNSCII16),
-                DBGP_UNSCII16_WIDTH, DBGP_UNSCII16_HEIGHT) != 0) {
+                DBGP_UNSCII16_HEIGHT)) {
           SDL_Log("Unable to initialise DBGP: %s", SDL_GetError());
         }
       } break;
@@ -134,8 +134,8 @@ int main(void) {
   }
 
   SDL_free(iso_string);
-  DBGP_CloseFont(&unscii8);
-  DBGP_CloseFont(&unscii16);
+  DBGP_DestroyFont(&unscii8);
+  DBGP_DestroyFont(&unscii16);
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
   SDL_Quit();

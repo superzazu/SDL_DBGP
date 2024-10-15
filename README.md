@@ -21,9 +21,9 @@ int main(void) {
   SDL_CreateWindowAndRenderer("SDL_DBGP", 800, 600, 0, &window, &renderer);
 
   DBGP_Font font;
-  if (!DBGP_OpenFont(
+  if (!DBGP_CreateFont(
           &font, renderer, DBGP_UNSCII16, sizeof(DBGP_UNSCII16),
-          DBGP_UNSCII16_WIDTH, DBGP_UNSCII16_HEIGHT) != 0) {
+          DBGP_UNSCII16_HEIGHT) != 0) {
     SDL_Log("Unable to initialise DBGP_UNSCII16: %s", SDL_GetError());
     return 1;
   }
@@ -51,7 +51,7 @@ int main(void) {
     SDL_RenderPresent(renderer);
   }
 
-  DBGP_CloseFont(&font);
+  DBGP_DestroyFont(&font);
   SDL_Quit();
   return 0;
 }

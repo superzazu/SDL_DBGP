@@ -17,8 +17,8 @@
  * available (unscii2raw.py).
  * Checkout the file "example.c" for a full example, or jump right in:
  *
- * \sa DBGP_OpenFont
- * \sa DBGP_CloseFont
+ * \sa DBGP_CreateFont
+ * \sa DBGP_DestroyFont
  * \sa DBGP_Print
  * \sa DBGP_Printf
  * \sa DBGP_ColorPrint
@@ -60,10 +60,10 @@
  *
  * This struct should be considered read-only.
  *
- * \sa DBGP_OpenFont
+ * \sa DBGP_CreateFont
  */
 struct DBGP_Font {
-  Uint8 glyph_width; /**< the width in pixels of each glyph */
+  Uint8 glyph_width; /**< the width in pixels of each glyph. Always 8. */
   Uint8 glyph_height; /**< the height in pixels of each glyph */
   unsigned int nb_glyphs; /**< the number of glyphs in font */
   SDL_Texture* tex; /**< texture used when drawing text */
@@ -71,7 +71,7 @@ struct DBGP_Font {
 typedef struct DBGP_Font DBGP_Font; /**< Convenience typedef */
 
 /**
- * \fn bool DBGP_OpenFont(DBGP_Font* font, SDL_Renderer* renderer,
+ * \fn bool DBGP_CreateFont(DBGP_Font* font, SDL_Renderer* renderer,
  * const unsigned char* const raw_data, size_t raw_data_len, Uint8 glyph_width,
  * Uint8 glyph_height)
  * \brief Loads a font to use with DBGP_Print and DBGP_Printf
@@ -81,33 +81,32 @@ typedef struct DBGP_Font DBGP_Font; /**< Convenience typedef */
  *
  * \code
  * DBGP_Font font;
- * DBGP_OpenFont(&font, renderer, DBGP_UNSCII16, sizeof(DBGP_UNSCII16),
-    DBGP_UNSCII16_WIDTH, DBGP_UNSCII16_HEIGHT)
+ * DBGP_CreateFont(&font, renderer, DBGP_UNSCII16, sizeof(DBGP_UNSCII16),
+ *   DBGP_UNSCII16_HEIGHT)
  * \endcode
  *
  *    \param font The DBGP_Font object
  *    \param renderer The SDL2 renderer object that will be used to render
  *    \param raw_data A pointer to the font raw data
  *    \param raw_data_len The size in bytes of raw_data
- *    \param glyph_width the width in pixels of one glyph (character)
  *    \param glyph_height the height in pixels of one glyph (character)
  *   \return true on success or false on failure; call SDL_GetError()
  *           for more information.
  *
- * \sa DBGP_CloseFont
+ * \sa DBGP_DestroyFont
  */
-bool DBGP_OpenFont(
+bool DBGP_CreateFont(
     DBGP_Font* font, SDL_Renderer* renderer,
-    const unsigned char* const raw_data, size_t raw_data_len, Uint8 glyph_width,
+    const unsigned char* const raw_data, size_t raw_data_len,
     Uint8 glyph_height);
 
 /**
- * \fn void DBGP_CloseFont(DBGP_Font* font)
- * \brief Frees all memory allocated during DBGP_OpenFont.
+ * \fn void DBGP_DestroyFont(DBGP_Font* font)
+ * \brief Frees all memory allocated during DBGP_CreateFont.
  *
- * \sa DBGP_OpenFont
+ * \sa DBGP_CreateFont
  */
-void DBGP_CloseFont(DBGP_Font* font);
+void DBGP_DestroyFont(DBGP_Font* font);
 
 /**
  * \fn bool DBGP_ColorPrint(DBGP_Font* font, SDL_Renderer* renderer, int x,
