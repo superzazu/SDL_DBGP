@@ -194,8 +194,6 @@ bool DBGP_ColorPrint(
     return false;
   }
 
-  // printf("%s\n", str);
-
   Uint8 r = 0, g = 0, b = 0, a = 0;
   if (!SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a)) {
     SDL_Log("Error while getting renderer draw color: %s", SDL_GetError());

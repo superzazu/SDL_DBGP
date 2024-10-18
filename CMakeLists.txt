@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(SDL_DBGP
   LANGUAGES C
-  DESCRIPTION "Display ASCII text in SDL3 programs (in a VGA-like text mode)"
+  DESCRIPTION "Display UTF-8 text in SDL3 programs (in a VGA-like text mode)"
   HOMEPAGE_URL "https://github.com/superzazu/SDL_DBGP")
 
 find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
