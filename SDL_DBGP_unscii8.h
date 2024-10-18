@@ -1,10 +1,10 @@
 /*
- * Font data is "UNSCII-8" in the public domain.
- * See https://github.com/viznut/unscii
+ * Raw data to use with SDL_DBGP. Font is
+ * [UNSCII-8](https://github.com/viznut/unscii), in the public domain.
  */
 
-#ifndef DBGP_DBGP_UNSCII8_H
-#define DBGP_DBGP_UNSCII8_H
+#ifndef DBGP_UNSCII8_H
+#define DBGP_UNSCII8_H
 
 static const unsigned int DBGP_UNSCII8_WIDTH = 8;
 static const unsigned int DBGP_UNSCII8_HEIGHT = 8;
@@ -182,4 +182,4 @@ static const unsigned char DBGP_UNSCII8[256 * 8] = {
     0x66, 0x3e, 0x6,  0x3c, 0x60, 0x60, 0x7c, 0x66, 0x66, 0x7c, 0x60, 0x60,
     0x66, 0x0,  0x66, 0x66, 0x66, 0x3e, 0x6,  0x3c};
 
-#endif // DBGP_DBGP_UNSCII8_H
+#endif // DBGP_UNSCII8_H

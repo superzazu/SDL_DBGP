@@ -52,9 +52,6 @@ int main(void) {
     return 1;
   }
 
-  char* iso_string =
-      SDL_iconv_string("ISO-8859-1", "UTF-8", "Ébène", sizeof("Ébène"));
-
   SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
   int should_quit = 0;
@@ -111,29 +108,39 @@ int main(void) {
 
     DBGP_ColorPrintf(
         &unscii16, renderer, 0, 5 * 16, DBGP_DEFAULT_COLORS,
-        "A string with accents: $74%s", iso_string);
+        "A string with accents: $74%s", "Ébène");
 
     DBGP_ColorPrintf(
         &unscii8, renderer, 0, 7 * 16, DBGP_DEFAULT_COLORS,
         "Default fonts include the entire ISO-8859-1 charset:");
-    for (int i = 0; i < 256; i++) {
-      int x = (8 * 1) + (i % 32) * DBGP_UNSCII8_WIDTH;
-      int y = (8 * 16) + (i / 32) * DBGP_UNSCII8_HEIGHT;
-      DBGP_ColorPrintf(&unscii8, renderer, x, y, DBGP_DEFAULT_COLORS, "%c", i);
+    for (int cp = 0; cp < 256; cp++) {
+      int x = (8 * 1) + (cp % 32) * DBGP_UNSCII8_WIDTH;
+      int y = (8 * 16) + (cp / 32) * DBGP_UNSCII8_HEIGHT;
+
+      // encode codepoint into a valid UTF-8 sequence:
+      char str[3] = {cp, '\0'};
+      if (cp >= 0x80) {
+        str[0] = 0xc0 | cp >> 6;
+        str[1] = 0x80 | (cp & 0x3f);
+        str[2] = '\0';
+      }
+
+      DBGP_ColorPrintf(
+          &unscii8, renderer, x, y, DBGP_DEFAULT_COLORS, "%s", str);
     }
 
-    // SDL_SetRenderDrawColor(renderer, 0xFF, 0xff, 0xff, 0xff);
-    // SDL_RenderClear(renderer);
-
-    SDL_Color bg = {20, 20, 140, 120};
-    SDL_Color fg = {180, 120, 120, 255};
+    SDL_Color bg = {32, 32, 32, 120};
+    SDL_Color fg = {204, 104, 228, 255};
     DBGP_Printf(
-        &unscii16, renderer, 0, 20 * 10, bg, fg, "Bonjour RGB colours!");
+        &unscii16, renderer, 0, 20 * 10, bg, fg,
+        "Le Poète est semblable au prince des nuées\n"
+        "Qui hante la tempête et se rit de l'archer ;\n"
+        "Exilé sur le sol au milieu des huées,\n"
+        "Ses ailes de géant l'empêchent de marcher.");
 
     SDL_RenderPresent(renderer);
   }
 
-  SDL_free(iso_string);
   DBGP_DestroyFont(&unscii8);
   DBGP_DestroyFont(&unscii16);
   SDL_DestroyRenderer(renderer);

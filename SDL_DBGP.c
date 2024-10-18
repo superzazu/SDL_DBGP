@@ -101,6 +101,7 @@ bool DBGP_Print(
   }
 
   for (int pass = 0; pass < 2; pass++) {
+    const char* ptr = str;
     int ix = x;
     int iy = y;
 
@@ -113,31 +114,32 @@ bool DBGP_Print(
       SDL_SetTextureColorMod(font->tex, fg_color.r, fg_color.g, fg_color.b);
     }
 
-    const char* ptr = str;
-    while (*ptr != '\0') {
-      if (*ptr == '\n') {
-        iy += font->glyph_height;
-        ix = x;
-      } else {
-        SDL_FRect r = {ix, iy, font->glyph_width, font->glyph_height};
-
-        if (pass == 0) {
-          // background
-          SDL_RenderFillRect(renderer, &r);
-        } else {
-          // foreground
-          Uint8 i = *ptr;
-          SDL_FRect src = {
-              i % GLYPHS_PER_LINE * font->glyph_width,
-              i / GLYPHS_PER_LINE * font->glyph_height, font->glyph_width,
-              font->glyph_height};
-          SDL_RenderTexture(renderer, font->tex, &src, &r);
-        }
-
-        ix += font->glyph_width;
+    Uint32 cp = 0;
+    while ((cp = SDL_StepUTF8(&ptr, NULL)) != 0) {
+      if (cp >= 256 && cp == SDL_INVALID_UNICODE_CODEPOINT) {
+        continue;
       }
 
-      ptr += 1;
+      if (cp == '\n') {
+        iy += font->glyph_height;
+        ix = x;
+        continue;
+      }
+      SDL_FRect r = {ix, iy, font->glyph_width, font->glyph_height};
+
+      if (pass == 0) {
+        // background
+        SDL_RenderFillRect(renderer, &r);
+      } else {
+        // foreground
+        SDL_FRect src = {
+            cp % GLYPHS_PER_LINE * font->glyph_width,
+            cp / GLYPHS_PER_LINE * font->glyph_height, font->glyph_width,
+            font->glyph_height};
+        SDL_RenderTexture(renderer, font->tex, &src, &r);
+      }
+
+      ix += font->glyph_width;
     }
   }
 
@@ -192,25 +194,41 @@ bool DBGP_ColorPrint(
     return false;
   }
 
+  // printf("%s\n", str);
+
   Uint8 r = 0, g = 0, b = 0, a = 0;
   if (!SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a)) {
     SDL_Log("Error while getting renderer draw color: %s", SDL_GetError());
   }
 
   for (int pass = 0; pass < 2; pass++) {
+    const char* ptr = str;
     int ix = x;
     int iy = y;
     Uint8 icolors = colors;
 
-    const char* ptr = str;
-    while (*ptr != '\0') {
-      if (*ptr == DBGP_ESCAPE_CHAR && is_hex(*(ptr + 1)) &&
-          is_hex(*(ptr + 2)) && DBGP_ENABLE_ESCAPING) {
-        Uint8 bg = get_hex_value(*(ptr + 1));
-        Uint8 fg = get_hex_value(*(ptr + 2));
-        icolors = (bg & 0xf) << 4 | (fg & 0xf);
-        ptr += 2;
-      } else if (*ptr == '\n') {
+    Uint32 cp = 0;
+    while ((cp = SDL_StepUTF8(&ptr, NULL)) != 0) {
+      if (cp >= 256 && cp == SDL_INVALID_UNICODE_CODEPOINT) {
+        continue;
+      }
+
+      if (cp == DBGP_ESCAPE_CHAR && DBGP_ENABLE_ESCAPING) {
+        const char* ptr_start_seq = ptr;
+        Uint32 cp1 = SDL_StepUTF8(&ptr, NULL);
+        Uint32 cp2 = SDL_StepUTF8(&ptr, NULL);
+
+        if (is_hex(cp1) && is_hex(cp2)) {
+          Uint8 bg = get_hex_value(cp1);
+          Uint8 fg = get_hex_value(cp2);
+          icolors = (bg & 0xf) << 4 | (fg & 0xf);
+          continue;
+        } else {
+          ptr = ptr_start_seq;
+        }
+      }
+
+      if (cp == '\n') {
         iy += font->glyph_height;
         ix = x;
       } else {
@@ -227,10 +245,9 @@ bool DBGP_ColorPrint(
           }
         } else {
           // foreground
-          Uint8 i = *ptr;
           SDL_FRect src = {
-              i % GLYPHS_PER_LINE * font->glyph_width,
-              i / GLYPHS_PER_LINE * font->glyph_height, font->glyph_width,
+              cp % GLYPHS_PER_LINE * font->glyph_width,
+              cp / GLYPHS_PER_LINE * font->glyph_height, font->glyph_width,
               font->glyph_height};
           Uint32 fg_color = color_palette[icolors & 0xf];
           // SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
@@ -242,8 +259,6 @@ bool DBGP_ColorPrint(
 
         ix += font->glyph_width;
       }
-
-      ptr += 1;
     }
   }
 
