@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 project(SDL_DBGP
   LANGUAGES C
@@ -10,7 +10,7 @@ find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
 add_library(SDL_DBGP STATIC SDL_DBGP.c)
 target_link_libraries(SDL_DBGP PRIVATE SDL3::SDL3)
 set_target_properties(SDL_DBGP PROPERTIES C_STANDARD 99)
-if (MSVC)
+if(MSVC)
   target_compile_options(SDL_DBGP PRIVATE /W4)
 else()
   target_compile_options(SDL_DBGP PRIVATE -Wall -Wextra -pedantic)
@@ -20,7 +20,7 @@ endif()
 add_executable(SDL_DBGP-example example.c)
 target_link_libraries(SDL_DBGP-example PRIVATE SDL3::SDL3 SDL_DBGP)
 set_target_properties(SDL_DBGP-example PROPERTIES C_STANDARD 99)
-if (MSVC)
+if(MSVC)
   target_compile_options(SDL_DBGP-example PRIVATE /W4)
 else()
   target_compile_options(SDL_DBGP-example PRIVATE -Wall -Wextra -pedantic)
